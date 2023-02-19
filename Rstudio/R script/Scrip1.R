@@ -1,3 +1,15 @@
-Print("The first commit")
+"This regrading to the assignment for treatment"
 
-Print(" In this we want to show the version control")
+#Loading the library
+library(readxl)
+
+
+
+
+
+
+#Loading the data
+ADSL<- read_excel("C://Users//Mina/Documents/GitHub//RSTUDIO_Mina//Rstudio//Data//data.xlsx", sheet = "ADSL")
+ADLB<- read_excel("C://Users//Mina/Documents/GitHub//RSTUDIO_Mina//Rstudio//Data//data.xlsx", sheet = "ADLB")
+
+
