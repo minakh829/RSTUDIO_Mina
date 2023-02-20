@@ -34,6 +34,11 @@ remove_duplicate<-function(df,fL=TRUE){
   return(df)
 }
 
+add_weeknumber<-function(df){
+  
+  df<- df %>% dplyr::mutate(WeekNumber=as.numeric(str_split_fixed(str_split_fixed(df$AVISIT, "[(Week]", 6)[,6], "[)]", 2)[,1]))
+  return(df)
+}
 
 
 
@@ -45,12 +50,11 @@ ADSL_processed<-check_height(ADSL_processed)
 ADLB_ex1<-preprocessing_ex1(ADLB)
 ADLB_ex2<-preprocessing_ex2(ADLB)
 ADLB_processed<-remove_duplicate(ADLB_ex1)
+ADLB_ex2<-add_weeknumber(ADLB_ex2)
 
 
 
-
-#df1<-df1 %>% mutate(ANL01FL=tolower(ANL01FL))
-
+# df1<-df1 %>% mutate(ANL01FL=tolower(ANL01FL))
 
 
 
