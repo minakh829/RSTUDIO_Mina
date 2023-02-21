@@ -2,8 +2,8 @@
 
 library(dplyr)
 library(stringr)
-
-
+library(ggplot2)
+library(readxl)
 
 check_weight<-function(df){
   
@@ -22,14 +22,14 @@ return(df)
 
 preprocessing_ex1<-function(df){
   
-  df<- df%>% dplyr::filter(PARAMCD=="C64849B",VISITNUM==10)
+  df<- df%>% dplyr::filter(PARAMCD=="C64849B",VISITNUM==10, FASFL=="Y")
   return(df)
 }
 
 
 preprocessing_ex2<-function(df){
   
-  df<- df%>% dplyr::filter(PARAMCD=="C64849B",ANL01FL=="Y")
+  df<- df%>% dplyr::filter(PARAMCD=="C64849B",ANL01FL=="Y", FASFL=="Y")
   return(df)
 }
 
@@ -49,7 +49,7 @@ add_weeknumber<-function(df){
 
 #Main functions 
 
-library(readxl)
+
 
 
 
@@ -77,5 +77,22 @@ dataexe1<- ADSL_processed%>% left_join(ADLB_ex1,by="SUBJID")
 # df1<-df1 %>% mutate(ANL01FL=tolower(ANL01FL))
 
 
+#Ex1
+
+y<-matrix(dataexe1 %>% select(AGE,WGTBL,HGTBL,DIABDUR,AVAL)%>% drop_na() %>% summarise_all(list(mean=mean,max=max,std=sd,min=min)),nrow=5)
+rownames(y)=c('age','weight','Height','DIABDUR','HbA1c ')
+colnames(y)=c('mean','max','std','min')
+Number=colSums(!is.na(dataexe1))[c("AGE","WGTBL","HGTBL","DIABDUR","AVAL")]
+Total_table<- cbind(y,Number)
+
+
+
+#Ex2
+
+TRTP_by <- dataexe2 %>%
+  group_by(WeekNumber,TRTP) %>%
+  summarize(meanAVAL = mean(AVAL),
+            )
+ggplot2::ggplot(TRTP_by,aes(WeekNumber,meanAVAL,color=TRTP))+geom_line()
 
 
