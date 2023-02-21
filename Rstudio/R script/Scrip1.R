@@ -13,4 +13,5 @@ ADSL<- read_excel("C://Users//Mina/Documents/GitHub//RSTUDIO_Mina//Rstudio//Data
 ADLB<- read_excel("C://Users//Mina/Documents/GitHub//RSTUDIO_Mina//Rstudio//Data//data.xlsx", sheet = "ADLB")
 
 
-triple(2)
+
+
