@@ -41,15 +41,15 @@ run;
 
 
 %macro preprocessing_ex1(dsn=);
-data Treat.ex1;
+data Treat.ADLB_ex1;
 set &dsn.;
-where PARAMCD="C64849B" and VISITNUM=10 ;
+where PARAMCD="C64849B" and (VISITNUM=10 and ANL01FL="Y");
 run;
 %mend preprocessing_ex1;
 
 
 %macro preprocessing_ex2(dsn=);
-data Treat.ex2;
+data Treat.ADLB_ex2;
 set &dsn.;
 where PARAMCD="C64849B"and ANL01FL="Y" ;
 run;
@@ -77,6 +77,25 @@ run;
 %mend add_weeknumber;
 
 
+%macro merge_tables(dsn1=,dsn2=,col=);
+proc sort data=&dsn1. ;by &col.;run;
+proc sort data=&dsn2. ;by &col.;run;
+data Treat.dataEx1;
+merge &dsn1. (in=a)
+&dsn2. (in=b);
+by &col.;
+if a;
+run;
+%mend merge_tables;
+
+
+
+
+
+
+
+
+
 
 /*Main part of running*/
 
@@ -90,16 +109,55 @@ run;
 %preprocessing_ex2(dsn=Treat.ADLB);
 
 
-%remove_duplicate(dsn=Treat.EX1);
+%remove_duplicate(dsn=Treat.ADLB_EX1);
 
-%add_weeknumber(dsn=Treat.EX2);
-
-
+%add_weeknumber(dsn=Treat.ADLB_EX2);
 
 
+%merge_tables(dsn1=Treat.ADSL,dsn2=Treat.ADLB_EX1,col=SUBJID);
+
+Data Treat.DataEx1;
+set Treat.DataEx1;
+rename AVAL=HbA1c ;
+run; 
+
+
+proc means data=Treat.DataEx1 (drop=visitnum);
 
 
 
 
-                                                                                                                           
-  
+
+/*
+proc means data=Treat.ADLB_ex2 mean ;
+class  WeekNumber TRTP;
+output out=Treat.MeanOut;
+run;
+*/
+
+                                                                                                                       
+ *Ex2
+
+proc sql;
+create table Treat.New as
+select mean(AVAL) as mean_AVAL ,TRTP, WEEKNUMBER  from Treat.ADLB_ex2 
+ group by  TRTP , WeekNumber;
+
+quit;
+
+
+
+
+ods graphics / reset width=6.4in height=4.8in imagemap;
+
+proc sgplot data=TREAT.NEW;
+    title color=black "Treatment" color=blue;
+	scatter x=WeekNumber y=mean_AVAL / group=TRTP;
+	series x=WeekNumber y=mean_AVAL / group=TRTP;
+	refline 6.5 / axis=y lineattrs=(thickness=2 color=green) label="6.5" ;
+	refline 7.5 / axis=y lineattrs=(thickness=2 color=green) label="7.5" ;
+	xaxis grid;
+	yaxis grid;
+run;
+
+ods graphics / reset; 
